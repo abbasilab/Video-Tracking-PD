@@ -12,13 +12,12 @@ from sklearn.manifold import TSNE, MDS
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
-from modules.utils import splitter, ci, interp_roc
+from modules.utils import ci, interp_roc
 
 
 def VisualizeAll(features: pd.DataFrame,
                  labels: pd.DataFrame,
                  results: dict,
-                 split: bool = False,
                  out_dir: Path = None) -> None:
     if out_dir:
         out_dir.mkdir(parents=True, exist_ok=True)
@@ -27,8 +26,6 @@ def VisualizeAll(features: pd.DataFrame,
     features, labels = features.drop('id', axis=1), labels.drop('id', axis=1)
     if 'id2' in features:
         features.drop('id2', axis=1)
-    if split:
-        features, labels = splitter(features, labels)
 
     # show stats
     df1 = pd.DataFrame.from_dict(

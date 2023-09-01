@@ -350,36 +350,6 @@ class LandmarkSeries(ABC):
             good_segments = sorted(
                 good_segments, key=lambda x: x[1] - x[0], reverse=True)
 
-        # # split segments if too large
-        # self.segments = []
-        # for s in good_segments:
-        #     duration = s[1] - s[0]
-        #     target = int(self.min_duration)
-        #     if duration < target:
-        #         continue
-        #     start = s[0]
-        #     while duration >= target:
-        #         self.segments.append((start, start + target))
-        #         start += target
-        #         duration -= target
-
-
-        # # split segments if too large
-        # self.segments = []
-        # for s in good_segments:
-        #     duration = s[1] - s[0]
-        #     if duration < self.min_duration:
-        #         continue
-        #     if self.max_duration:
-        #         start = s[0]
-        #         while duration >= self.min_duration:
-        #             size = int(min(self.max_duration, duration))
-        #             self.segments.append((start, start + size))
-        #             duration -= size
-        #             start += size
-        #     else:
-        #         self.segments.append((s[0], s[1]))
-
         # split segments if too large
         self.segments = []
         for s in good_segments:
@@ -398,24 +368,6 @@ class LandmarkSeries(ABC):
                     start += size
             else:
                 self.segments.append((s[0], s[1]))
-
-        # # split segments if too large
-        # self.segments = []
-        # for s in good_segments:
-        #     duration = s[1] - s[0]
-        #     if self.min_duration and duration < self.min_duration:
-        #         continue
-        #     if self.max_duration:
-        #         p = np.ceil(np.log(duration/self.max_duration)/np.log(2))
-        #         split_size = int(duration // 2**p)
-        #         split_cnt = int(duration // split_size)
-        #         start = s[0]
-        #         for _ in range(split_cnt-1):
-        #             self.segments.append((start, start + split_size))
-        #             start += split_size
-        #         self.segments.append((start, s[1]))
-        #     else:
-        #         self.segments.append((s[0], s[1]))
 
         self.seg_cnt = len(self.segments)
         joints = [[j[0][slice(*s)] for s in self.segments]

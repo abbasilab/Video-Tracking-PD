@@ -20,14 +20,6 @@ def to_frequency_domain(x: np.ndarray, dt: float) -> Tuple[np.ndarray, np.ndarra
     return amp, freq
 
 
-def mean_confidence_interval(data, confidence=0.95):
-    a = 1.0 * np.array(data)
-    n = len(a)
-    m, se = np.mean(a), stats.sem(a)
-    h = se * stats.t.ppf((1 + confidence) / 2., n-1)
-    return m, m-h, m+h
-
-
 def find_outliers(arr: np.ndarray,
                   m: float = 3,
                   mode: str = 'median') -> Tuple[np.ndarray, np.ndarray]:
@@ -64,6 +56,7 @@ def studentization(x: np.ndarray, mode: str = 'mean') -> np.ndarray:
 
 
 def interp_roc(fpr: np.ndarray, tpr: np.ndarray, N: int = 100) -> pd.Series:
+    """Interpolate ROC curve"""
     int_fpr = np.linspace(0.0, 1.0, N)
     int_tpr = [np.interp(int_fpr, xx, yy) for xx, yy in zip(fpr, tpr)]
     for arr in int_tpr:
@@ -79,13 +72,13 @@ def closestDivisors(n: int) -> Tuple[int, int]:
     return a, n//a
 
 
-def VIF(df: pd.DataFrame) -> np.ndarray:
-    vif = [variance_inflation_factor(df.values, ix)
-           for ix in range(df.shape[1])]
-    return np.array(vif)
-
-
 def VIF_pruning(df: pd.DataFrame, threshold: float = 10.0) -> List:
+    """Variance Inflation Factor feature selection"""
+    def VIF(df: pd.DataFrame) -> np.ndarray:
+        vif = [variance_inflation_factor(df.values, ix)
+               for ix in range(df.shape[1])]
+        return np.array(vif)
+
     vars = list(df.columns)
     while True:
         vif = VIF(df.loc[:, vars])
@@ -96,16 +89,24 @@ def VIF_pruning(df: pd.DataFrame, threshold: float = 10.0) -> List:
     return vars
 
 
-def splitter(X: pd.DataFrame, y: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    all_right = np.array([s.count('left') for s in X.columns]) < 2
-    all_left = np.array([s.count('right') for s in X.columns]) < 2
-    all_right = X.iloc[:, all_right]
-    all_left = X.iloc[:, all_left]
-    all_left.columns = all_right.columns
-    return pd.concat([all_right, all_left]), pd.concat([y, y])
+# def splitter(X: pd.DataFrame, y: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+#     all_right = np.array([s.count('left') for s in X.columns]) < 2
+#     all_left = np.array([s.count('right') for s in X.columns]) < 2
+#     all_right = X.iloc[:, all_right]
+#     all_left = X.iloc[:, all_left]
+#     all_left.columns = all_right.columns
+#     return pd.concat([all_right, all_left]), pd.concat([y, y])
+
+def mean_confidence_interval(data, confidence=0.95):
+    a = 1.0 * np.array(data)
+    n = len(a)
+    m, se = np.mean(a), stats.sem(a)
+    h = se * stats.t.ppf((1 + confidence) / 2., n-1)
+    return m, m-h, m+h
 
 
 def ci(data, confidence=0.999):
+    """Compute confidence interval"""
     a = 1.0 * np.array(data)
     n = len(a)
     _, se = np.mean(a), stats.sem(a)
@@ -114,7 +115,14 @@ def ci(data, confidence=0.999):
 
 
 def se(data):
+    """Compute standard error"""
     a = 1.0 * np.array(data)
     n = len(a)
     _, se = np.mean(a), stats.sem(a)
     return se
+
+
+def count_correct(y_true, y_pred):
+    y_true = np.array(y_true).squeeze()
+    y_pred = np.array(y_pred).squeeze()
+    return np.count_nonzero(y_true == y_pred)
