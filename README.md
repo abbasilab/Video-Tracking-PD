@@ -1,4 +1,4 @@
-# Video-Based Tracking of Clinical States in Patients with Parkinson's Disease
+# Interpretable Video-Based Tracking of Clinical States in Patients with Parkinson's Disease
 
 Authors: Daniel Deng, Jill L. Ostrem, Vy Nguyen, Daniel D. Cummins, Julia Sun, Anupam Pathak, Simon Little, Reza Abbasi-Asl
 
