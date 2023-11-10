@@ -88,14 +88,13 @@ def VIF_pruning(df: pd.DataFrame, threshold: float = 10.0) -> List:
         del vars[idx]
     return vars
 
-
-# def splitter(X: pd.DataFrame, y: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
-#     all_right = np.array([s.count('left') for s in X.columns]) < 2
-#     all_left = np.array([s.count('right') for s in X.columns]) < 2
-#     all_right = X.iloc[:, all_right]
-#     all_left = X.iloc[:, all_left]
-#     all_left.columns = all_right.columns
-#     return pd.concat([all_right, all_left]), pd.concat([y, y])
+def splitter(X: pd.DataFrame, y: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    all_right = np.array([s.count('left') for s in X.columns]) < 2
+    all_left = np.array([s.count('right') for s in X.columns]) < 2
+    all_right = X.iloc[:, all_right]
+    all_left = X.iloc[:, all_left]
+    all_left.columns = all_right.columns
+    return pd.concat([all_right, all_left]), pd.concat([y, y])
 
 def mean_confidence_interval(data, confidence=0.95):
     a = 1.0 * np.array(data)
