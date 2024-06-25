@@ -56,7 +56,7 @@ def VisualizeAll(features: pd.DataFrame,
     fig, axes = plt.subplots(3, 3, figsize=(10, 10))
     axes = axes.ravel()
     total = np.sum(pd.DataFrame.from_dict(results['conf_mats']), axis=0)
-    for i, (k, v) in enumerate(total.iteritems()):
+    for i, (k, v) in enumerate(total.items()):
         ax = axes[i]
         v = v / np.sum(v)
         sns.heatmap(v, annot=True, fmt='.2f', ax=ax, square=True, vmin=0, vmax=0.5,

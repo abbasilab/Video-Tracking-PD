@@ -20,14 +20,15 @@ def eval_all(models: Dict,
              labels: pd.DataFrame,
              alphas: list = None,
              n_repeats: int = 10,
-             selected: list = None) -> Dict:
+             selected: list = None,
+             weighted: bool = False) -> Dict:
     if alphas is None:
-        alphas = compute_alphas(features, labels)
+        alphas = compute_alphas(features, labels, weighted=weighted)
         print(alphas)
     results = defaultdict(list)
     for name, clf in models.items():
         result = eval_model(
-            name, clf, params[name], features, labels, alphas, n_repeats, selected)
+            name, clf, params[name], features, labels, alphas, n_repeats, selected, weighted=weighted)
         results[name].append(result)
     processed = defaultdict(lambda: defaultdict(list))
     for model_name, result_list in results.items():
@@ -38,7 +39,7 @@ def eval_all(models: Dict,
     return results
 
 
-def compute_alphas(X: pd.DataFrame, y: pd.DataFrame):
+def compute_alphas(X: pd.DataFrame, y: pd.DataFrame, weighted: bool = False) -> list:
     XX, yy = X.drop('id', axis=1), y.drop('id', axis=1)
     if 'id2' in X:
         XX = XX.drop('id2', axis=1)
@@ -53,7 +54,7 @@ def compute_alphas(X: pd.DataFrame, y: pd.DataFrame):
         # if True:
         #     X_train, y_train = splitter(X_train, y_train)
             
-        alpha = alpha_loocv(X_train, y_train, alphas=np.logspace(-4, 0, 128))
+        alpha = alpha_loocv(X_train, y_train, np.logspace(-4, 0, 128), weighted=weighted)
         alphas.append(alpha)
         pbar.set_postfix({'Alpha': alpha})
     return alphas
@@ -66,7 +67,8 @@ def eval_model(name: str,
                y: pd.DataFrame,
                alphas: list,
                n_repeats: int = 100,
-               selected: list = None) -> Dict:
+               selected: list = None,
+               weighted: bool = False) -> Dict:
 
     results = defaultdict(list)
 
@@ -78,6 +80,8 @@ def eval_model(name: str,
 
         # init
         pred_prob, pred, gt = [], [], []
+        if weighted:
+            sample_weights = []
 
         # LOOCV
         loo = LeaveOneSubjectOut()
@@ -115,7 +119,7 @@ def eval_model(name: str,
                 X_test = X_test[to_keep]
 
             # hyperparam tuning
-            best_params = tune_loocv(X_train, y_train, clf, params)
+            best_params = tune_loocv(X_train, y_train, clf, params, weighted=weighted)
             clf.set_params(**best_params)
 
             # get results
@@ -127,15 +131,23 @@ def eval_model(name: str,
             pred_prob.extend(np.array(p).reshape(-1,))
             pred.extend(clf.predict(X_test).reshape(-1,))
             gt.extend(np.array(y_test).reshape(-1,))
+            if weighted:
+                sample_weights.extend([1 / len(test)] * len(test))
 
             # update info
             pbar.set_postfix({'CV': f'{i}/{n}', '# Feats': len(to_keep),
                              't_Acc': np.round(clf.score(X_train, y_train), 2)})
 
         # store results
-        fpr, tpr, _ = roc_curve(gt, pred_prob)
+        if weighted:
+            fpr, tpr, _ = roc_curve(gt, pred_prob)
+        else:
+            fpr, tpr, _ = roc_curve(gt, pred)
         roc_auc = auc(fpr, tpr)
-        acc = accuracy_score(gt, pred)
+        if weighted:
+            acc = accuracy_score(gt, pred, sample_weight=sample_weights)
+        else:
+            acc = accuracy_score(gt, pred)
         conf_mat = confusion_matrix(gt, pred)
         pbar.set_description(f'{name} [Acc={acc:.2f}, AUC={roc_auc:.2f}]')
 

@@ -2,7 +2,7 @@
 
 Authors: Daniel Deng, Jill L. Ostrem, Vy Nguyen, Daniel D. Cummins, Julia Sun, Anupam Pathak, Simon Little, Reza Abbasi-Asl
 
-Manuscript: https://www.medrxiv.org/content/10.1101/2023.11.04.23298083v1
+Manuscript: https://doi.org/10.1038/s41531-024-00742-x
 
 ## Installation
 
@@ -36,8 +36,8 @@ To run the analysis, follow the code instructions in `./analysis.ipynb`. By defa
 
 ## Version
 
-Last update: Sept 2023, v1.0
+Last update: June 2024, v1.1
 
 ## Citation
 
-Daniel Deng, Jill L. Ostrem, Vy Nguyen, Daniel D. Cummins, Julia Sun, Anupam Pathak, Simon Little, Reza Abbasi-Asl. Interpretable Video-Based Tracking and Quantification of Parkinsonism Clinical Motor States. medRxiv 2023.11.04.23298083; doi: https://doi.org/10.1101/2023.11.04.23298083
+Deng, D., Ostrem, J.L., Nguyen, V. *et al.* Interpretable video-based tracking and quantification of parkinsonism clinical motor states. *npj Parkinsons Dis.*  **10** , 122 (2024). https://doi.org/10.1038/s41531-024-00742-x
